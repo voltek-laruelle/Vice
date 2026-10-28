@@ -2631,8 +2631,14 @@ class ShareServer:
             return web.json_response({"ok": True})
         raise web.HTTPNotFound()
 
-    async def _api_uninstall(self, _: web.Request) -> web.Response:
+    def _require_same_origin(self, req: web.Request) -> None:
+        expected_origin = self.local_base_url()
+        if expected_origin is None or req.headers.get("Origin") != expected_origin:
+            raise web.HTTPForbidden(text="Request origin is not allowed")
+
+    async def _api_uninstall(self, req: web.Request) -> web.Response:
         """Launch a detached uninstall process, then exit the daemon cleanly."""
+        self._require_same_origin(req)
         import os
         import signal as _sig
         import subprocess as _sp
@@ -2888,8 +2894,9 @@ class ShareServer:
             found = None
         return web.json_response({"ok": True, "update": found})
 
-    async def _api_quit(self, _: web.Request) -> web.Response:
+    async def _api_quit(self, req: web.Request) -> web.Response:
         """Stop the daemon (browser-mode quit, native window uses pywebview API)."""
+        self._require_same_origin(req)
         import os, signal as _sig
         response = web.json_response({"ok": True})
         asyncio.get_event_loop().call_later(0.2, lambda: os.kill(os.getpid(), _sig.SIGTERM))

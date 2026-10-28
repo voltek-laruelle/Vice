@@ -162,6 +162,41 @@ class ShareServerSecurityTests(unittest.IsolatedAsyncioTestCase):
         ws = await self.client.ws_connect(f"ws://127.0.0.1:{self.local_port}/ws")
         await ws.close()
 
+    async def test_uninstall_requires_same_origin(self) -> None:
+        local_base = self.server.local_base_url()
+        with mock.patch("subprocess.Popen") as launch, mock.patch("os.kill") as kill:
+            async with self.client.post(f"{local_base}/api/uninstall") as resp:
+                self.assertEqual(resp.status, 403)
+            async with self.client.post(
+                f"{local_base}/api/uninstall",
+                data={"request": "test"},
+                headers={"Origin": "http://attacker.example"},
+            ) as resp:
+                self.assertEqual(resp.status, 403)
+            launch.assert_not_called()
+            kill.assert_not_called()
+
+            async with self.client.post(
+                f"{local_base}/api/uninstall",
+                headers={"Origin": local_base},
+            ) as resp:
+                self.assertEqual(resp.status, 200)
+                self.assertEqual(await resp.json(), {"ok": True})
+            await asyncio.sleep(0.5)
+            launch.assert_called_once()
+            kill.assert_called_once()
+
+    async def test_quit_requires_same_origin(self) -> None:
+        local_base = self.server.local_base_url()
+        with mock.patch("os.kill") as kill:
+            async with self.client.post(
+                f"{local_base}/api/quit",
+                headers={"Origin": "http://attacker.example"},
+            ) as resp:
+                self.assertEqual(resp.status, 403)
+            await asyncio.sleep(0.3)
+            kill.assert_not_called()
+
     async def test_public_server_only_serves_share_routes(self) -> None:
         public_base = f"http://127.0.0.1:{self.public_port}"
         token = _share_token(self.server, "test_clip")
