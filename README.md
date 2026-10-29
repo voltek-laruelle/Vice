@@ -369,7 +369,7 @@ Vice is better because these people sent patches:
 - [@quadruplea0](https://github.com/quadruplea0), for making the resolution setting actually reach gpu-screen-recorder
 - [@DeveloperSpoot](https://github.com/DeveloperSpoot), for themed Discord embeds, their idea and their first implementation
 - [@jethrothelion](https://github.com/jethrothelion), for Chivalry 2 and Clone Drone in The Danger Zone
-- [@voltek-laruelle](https://github.com/voltek-laruelle), for the clip volume slider, the French translation, and for GeoGuessr Steam Edition, Forza Horizon 4, Big Walk, Supermarket Simulator, Sandustry, and OpenFront
+- [@voltek-laruelle](https://github.com/voltek-laruelle), for the clip volume slider, French translations, bug fixes, and contributions to GeoGuessr Steam Edition, Forza Horizon 4, Big Walk, Supermarket Simulator, Sandustry, and OpenFront.
 - [@20plays](https://github.com/20plays), for system tray support, preserving working Arch installations during installer dependency checks, and selecting the distro Python for QtWebEngine
 - [@KITE-Force](https://github.com/KITE-Force), for game detection on KDE Plasma Wayland through kdotool, and for fixing scroll dismissal in clip context menus
 - [@UMCEKO](https://github.com/UMCEKO), for the NixOS package and module
