@@ -522,7 +522,8 @@ def _trimmed_copy_path(path: Path) -> Path:
     return candidate
 
 
-def _key_burn_for(project: dict, sources: dict, work: Path, accent: str) -> Optional[KeyBurn]:
+def _key_burn_for(project: dict, sources: dict, work: Path, accent: str,
+                  layout: str = "qwerty") -> Optional[KeyBurn]:
     """The keyboard panel for an export, or None when no clip in it has keys
     or the panel cannot be drawn here."""
     intervals = {}
@@ -535,7 +536,7 @@ def _key_burn_for(project: dict, sources: dict, work: Path, accent: str) -> Opti
     _, height, _ = canvas_for(project, sources)
     try:
         from .key_overlay import render_burn_assets
-        assets = render_burn_assets(work, accent, max(0.5, height / 1080))
+        assets = render_burn_assets(work, accent, max(0.5, height / 1080), layout)
     except Exception as exc:  # pycairo missing, or a drawing failure
         log.warning("Exporting without the keyboard panel: %s", exc)
         return None
@@ -2585,7 +2586,8 @@ class ShareServer:
         key_burn = None
         if body.get("keys"):
             key_burn = await asyncio.to_thread(
-                _key_burn_for, project, sources, work / "keys", accent)
+                _key_burn_for, project, sources, work / "keys", accent,
+                self.cfg.overlay.keys_layout)
         try:
             cmd = build_export_cmd(project, sources, tmp,
                                    accent=accent,
